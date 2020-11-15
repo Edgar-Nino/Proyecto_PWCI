@@ -1,6 +1,7 @@
 productsCtrl = {};
 
 const Product = require('../models/products')
+ 
 
 productsCtrl.getProducts = async (req, res) => {
     try {
@@ -18,7 +19,7 @@ productsCtrl.createProduct = async (req, res) => {
 
         await newProduct.save();
 
-        res.send({ message: 'Se creo el producto' });
+        res.send({ status: 'Se creo el producto' });
     }
     catch (e) {
         res.status(500).json({ status: "No se pudo crear el producto" })
