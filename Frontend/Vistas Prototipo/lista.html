@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista</title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/lista.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        $(function () {
+            $("#navbar").load("./rec/navbar.html");
+
+            $.get("./rec/list-product.html", data => {
+                for (var i = 0; i < 5; i++) {
+                    $("#list-products-list").append(data);
+                }
+            })
+
+            $("#footer").load("./rec/footer.html");
+            $("#loginRegis").load("./rec/loginRegister.html");
+        })
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div id="navbar"></div>
+
+    <div class="row m-0 w-100">
+        <div class="col-sm-12 col-lg-4">
+            <div class="shadow card">
+                <img class="card-img-top h-100 w-100" src="https://vistapointe.net/images/white-wallpaper-8.jpg"
+                    alt="Card image cap">
+                <div class="card-body">
+                    <h5 class="card-title">Nombre Lista</h5>
+                    <p class="card-text">Descripcion</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><small>Username</small></li>
+                </ul>
+                <div class="card-footer">
+                    <small class="text-muted">Fecha</small>
+                </div>
+            </div>
+        </div>
+        <div id="items" class="col-sm-12 col-lg-8 ">
+            <div id="list-products-list" class="row m-0 w-100">
+                
+            </div>
+        </div>
+    </div>
+    <div class="mb-5"></div>
+    <div id="footer"></div>
+    <div id="loginRegis"></div>
+</body>
+
+</html>
