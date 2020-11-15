@@ -7,8 +7,7 @@ const userSchema = new Schema({
     username:{type:String,required:true, unique: true, uniqueCaseInsensitive: true},
     email:{type:String,required:true, unique: true, uniqueCaseInsensitive: true},
     password:{type:String,required:true},
-    imgURL:{type:Buffer,required:true},
-    imgType:{type:String, required:true},
+    imgURL:{type:String,required:true},
     type:{type:String,required:true,default:1},
 },{
     timestamps: true,

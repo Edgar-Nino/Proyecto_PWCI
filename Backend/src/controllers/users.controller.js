@@ -3,6 +3,8 @@ usersCtrl = {};
 const User = require('../models/users')
 const jwt = require('jsonwebtoken');
 
+const fs = require('fs')
+
 
 usersCtrl.getUsers = async (req, res) => {
     try {
@@ -38,24 +40,36 @@ usersCtrl.profile = async (req, res) => {
 
 usersCtrl.editUser = async (req, res) => {
     try {
+        var user = await User.findById(req.userId, { password: 0 })
+
         if (req.userId != req.params.id) return res.status(400).json({ status: 'No tienes privilegios para editar este usuario' })
-        u = new User;
-        req.body.password = await u.encryptPassword(req.body.password);
+        const editUser = new User();
+        req.body.password = await editUser.encryptPassword(req.body.password);
+
+        req.body.imgURL = req.file.filename;
 
         await User.findByIdAndUpdate(req.params.id, req.body);
+
+        await fs.unlink('./src/public/uploads/'+ user.imgURL, (err)=>{console.log(err)})
+
         return res.json({ status: 'Se actualizo el usuario' });
     }
     catch (e) {
-        console.log(e);
+        await fs.unlink('./src/public/uploads/'+ req.file.filename, (err)=>{})
         return res.status(500).json({ status: 'No se actualizo el usuario' })
     }
 }
 
 usersCtrl.deleteUser = async (req, res) => {
     try {
+        var user = await User.findById(req.userId, { password: 0 })
+
         if (req.userId != req.params.id) return res.status(400).json({ status: 'No tienes privilegios para eliminar este usuario' })
 
         await User.findByIdAndDelete(req.params.id);
+
+        await fs.unlink('./src/public/uploads/'+ user.imgURL, (err)=>{console.log(err)})
+
         return res.json({ status: 'El usuario se ha eliminado con exito' })
 
     } catch (e) {
@@ -65,7 +79,13 @@ usersCtrl.deleteUser = async (req, res) => {
 
 usersCtrl.logIn = async (req, res) => {
     try {
-        const user = await User.findOne({ email: req.body.email });
+        
+        const user = await User.findOne({$or: [
+            {email: req.body.email},
+            {username: req.body.username}
+        ]});
+
+        console.log(req.body)
 
         if (!user) return res.status(400).json({ status: 'El email o la contraseña estan mal' });
 
@@ -83,7 +103,8 @@ usersCtrl.logIn = async (req, res) => {
 
 usersCtrl.signUp = async (req, res) => {
     try {
-        const newUser = new User(req.body)
+        const newUser = new User(req.body);
+        newUser.imgURL = req.file.filename;
         newUser.password = await newUser.encryptPassword(newUser.password);
         const UserReg = await newUser.save();
         const token = jwt.sign({ _id: UserReg._id }, process.env.SECRETKEY || 'keyNoTanSecreta');
@@ -91,7 +112,9 @@ usersCtrl.signUp = async (req, res) => {
         res.header('auth-key', token).json(UserReg)
     } catch (e) {
         res.status(500).json({ status: e.message })
+        await fs.unlink('./src/public/uploads/'+ req.file.filename, (err)=>{})
     }
+
 }
 
 module.exports = usersCtrl;

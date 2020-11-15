@@ -5,22 +5,42 @@ const usersCtrl = require('../controllers/users.controller');
 
 const tokenValidator = require("../libs/validateToken")
 
-
-
 const path = require('path');
+srcPath = path.join(__dirname, "..", "/public/uploads/");
 
-srcPath = path.join(__dirname, '..');
+var multer = require('multer');
+const { time } = require('console');
 
-console.log(srcPath)
+var storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, srcPath)
+    },
+    filename: (req, file, cb) => {
+        var ext = path.extname(file.originalname)
+        cb(null, 'user' + '-' + Date.now() + ext)
+    }
+});
 
+var maxSize = 4 * 1024 * 1024;
 
+var upload = multer({
+    storage: storage,
+    fileFilter: function (req, file, callback) {
+        var ext = path.extname(file.originalname);
+        if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
+            return callback(new Error('Solo se admiten imagenes'))
+        }
+        callback(null, true)
+    },
+    limits: { fileSize: maxSize }
+}).single('image');
 
 router.get('/', usersCtrl.getUsers);
 router.get('/:id', usersCtrl.getUser);
 router.post('/logIn', usersCtrl.logIn);
-router.post('/signUp', usersCtrl.signUp);
-router.get('/profile', usersCtrl.profile);
-router.put('/:id', tokenValidator, usersCtrl.editUser);
+router.post('/signUp', upload, usersCtrl.signUp);
+router.get('/v1/profile', tokenValidator, usersCtrl.profile);
+router.put('/:id', [tokenValidator,upload], usersCtrl.editUser);
 router.delete('/:id', tokenValidator, usersCtrl.deleteUser);
 
 module.exports = router;
