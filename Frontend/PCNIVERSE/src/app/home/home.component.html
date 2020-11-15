@@ -1,0 +1,17 @@
+<h1 class="bg-info text-center">Listas más recientes</h1>
+<div class="row w-100">
+  <div class="col-sm-6 col-md-2" *ngFor="let list of lists">
+    <div class="card">
+      <img class="card-img-top h-100 w-100" src="{{url}}{{list.imgURL}}" alt="Card image cap">
+      <div class="card-body">
+        <h5 class="card-title">{{list.name}}</h5>
+        <p class="card-text">{{list.desc}}</p>
+      </div>
+      <div class="card-footer">
+        <small class="text-muted">{{list.createdAt}}</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h1 class="bg-info text-center">Productos más recientes</h1>
