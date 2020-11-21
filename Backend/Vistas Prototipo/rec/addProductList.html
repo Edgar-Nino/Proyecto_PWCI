@@ -1,0 +1,51 @@
+<div class="modal fade" id="AddProductList" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Agregar producto a tu lista</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="get">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text align-middle">
+                                <label for="options">¿Lo tienes o lo buscas?</label>
+                            </div>
+                        </div>
+                        <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                            <label class="btn btn-secondary active">
+                                <input type="radio" value="Tengo" name="options" id="option1" autocomplete="off"
+                                    checked> Lo tengo
+                            </label>
+                            <label class="btn btn-secondary">
+                                <input type="radio" value="Busco" name="options" id="option2" autocomplete="off"> Lo
+                                busco
+                            </label>
+                        </div>
+                    </div>
+
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="ListasList">Listas</label>
+                        </div>
+                        <select class="custom-select" name="Lista" id="ListasList">
+                            <option selected>Escoge...</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary">Agregar</button>
+            </div>
+        </div>
+    </div>
+</div>
