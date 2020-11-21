@@ -13,12 +13,16 @@
     <script>
         $(function () {
             $("#navbar").load("./rec/navbar.html");
+            $("#addModal").load("./rec/addProductList.html")
 
-            $.get("http://localhost:4000/api/users/", data => {
+            $.ajax({url:"http://localhost:4000/api/users/", type:"GET",
+                success:function(data,status,request){
                 data.map(data=>{
                     $("#list-list").append(getLists(data));
+
                 })
-            })
+                console.log(request.getAllResponseHeaders());
+            } }) 
 
             $.get("./rec/product.html", data => {
                 for (var i = 0; i < 5; i++) {
@@ -42,6 +46,7 @@
 <body>
 
     <div id="navbar"></div>
+    <div id="addModal"></div>
 
     <h1 class="shadow-sm bg-info text-center py-2">Listas más recientes</h1>
     <div id="list-list" class="row w-100 m-0">

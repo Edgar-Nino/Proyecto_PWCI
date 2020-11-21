@@ -8,7 +8,7 @@ const fs = require('fs')
 
 usersCtrl.getUsers = async (req, res) => {
     try {
-        var users = await User.find()
+        var users = await User.find({},{password:0})
 
         return res.json(users);
     }
