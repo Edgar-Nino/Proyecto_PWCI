@@ -9,15 +9,15 @@
     <link rel="stylesheet" href="css/bootstrap.min.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
+    <script src="./js/helper.js"></script>
     <script>
         $(function () {
             $("#navbar").load("./rec/navbar.html");
 
-            $.get("./rec/list.html", data => {
-                for (var i = 0; i < 5; i++) {
-                    $("#list-list").append(data);
-                }
+            $.get("http://localhost:4000/api/users/", data => {
+                data.map(data=>{
+                    $("#list-list").append(getLists(data));
+                })
             })
 
             $.get("./rec/product.html", data => {
