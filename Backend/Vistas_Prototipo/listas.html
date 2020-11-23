@@ -14,11 +14,15 @@
         $(function () {
             $("#navbar").load("./rec/navbar.html");
 
-            $.get("./rec/list.html", data => {
-                for (var i = 0; i < 5; i++) {
-                    $("#list-list").append(data);
-                }
-            })
+            $.ajax({url:"http://localhost:4000/api/lists/", type:"GET",
+                success:function(data,status,request){
+                data.map(data=>{
+                    $("#list-list").append(getLists(data));
+
+                })
+                console.log(request.getAllResponseHeaders());
+            },error:function(res,errorStatus,error)
+            {console.log(errorStatus)} }) 
 
             $("#footer").load("./rec/footer.html");
             $("#loginRegis").load("./rec/loginRegister.html");
