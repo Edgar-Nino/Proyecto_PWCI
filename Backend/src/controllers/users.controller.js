@@ -81,8 +81,8 @@ usersCtrl.logIn = async (req, res) => {
     try {
         
         const user = await User.findOne({$or: [
-            {email: req.body.email},
-            {username: req.body.username}
+            {email: req.body.identifier},
+            {username: req.body.identifier}
         ]});
 
         console.log(req.body)
