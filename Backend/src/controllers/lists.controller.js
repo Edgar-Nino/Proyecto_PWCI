@@ -50,8 +50,9 @@ listsCtrl.getList = async (req, res) => {
 
 listsCtrl.editList = async (req, res) => {
     try {
+        
         const list = await List.findOne({ _id: req.params.id });
-        if (req.userId != list.user_id) return res.status(400).json({ status: 'No tienes privilegios para eliminar esta lista' })
+        if (req.userId != list.user_id) return res.status(400).json({ status: 'No tienes privilegios para editar esta lista' })
 
         const user = await User.findOne({_id: req.userId},);
 
@@ -66,6 +67,7 @@ listsCtrl.editList = async (req, res) => {
     }
     catch (e) {
         res.status(500).json({ status: 'No se actualizo la lista' })
+        await fs.unlink('./src/public/uploads/'+ req.file.filename, (err)=>{})
     }
 }
 
