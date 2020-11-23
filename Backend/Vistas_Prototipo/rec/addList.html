@@ -8,51 +8,54 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" id="inputGroup-sizing-default">Nombre</span>
+            <form id="formAddList" method="POST">
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">Nombre</span>
+                        </div>
+                        <input type="text" name="name" class="form-control" required aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default">
                     </div>
-                    <input type="text" name="NombreLista" class="form-control" aria-label="Default"
-                        aria-describedby="inputGroup-sizing-default">
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Descripción</span>
+                        </div>
+                        <textarea class="form-control" name="desc" aria-label="With textarea" required></textarea>
+                    </div>
+
+
+
+                    <div class="input-group mb-3">
+                        <div class="custom-file">
+                            <input type="file" name="image" accept="image/*" class="custom-file-input" id="FileList" required>
+                            <label class="custom-file-label" for="FileList">Escoge una imagen</label>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-text">
+                            <label for="pubpriv">Publica o privada</label>
+                        </div>
+                        <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                            <label class="btn btn-secondary active">
+                                <input type="radio" value=true name="pubpriv" id="Publica" autocomplete="off"
+                                    checked>
+                                Publica
+                            </label>
+                            <label class="btn btn-secondary">
+                                <input type="radio" value=false name="pubpriv" id="Privada" autocomplete="off">
+                                Privada
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Descripción</span>
-                    </div>
-                    <textarea class="form-control" name="DescLista" aria-label="With textarea"></textarea>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <input type="submit" class="btn btn-primary" value="Enviar">
                 </div>
-
-
-
-                <div class="input-group mb-3">
-                    <div class="custom-file">
-                        <input type="file" name="filename" class="custom-file-input" id="FileList">
-                        <label class="custom-file-label" for="FileList">Escoge una imagen</label>
-                    </div>
-                </div>
-                <div class="input-group mb-3">
-                    <div class="input-group-text">
-                        <label for="pubpriv">Publica o privada</label>
-                    </div>
-                    <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
-                        <label class="btn btn-secondary active">
-                            <input type="radio" value="Public" name="pubpriv" id="Publica" autocomplete="off" checked>
-                            Publica
-                        </label>
-                        <label class="btn btn-secondary">
-                            <input type="radio" value="Private" name="pubpriv" id="Privada" autocomplete="off">
-                            Privada
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary">Agregar</button>
-            </div>
+            </form>
         </div>
     </div>
 </div>

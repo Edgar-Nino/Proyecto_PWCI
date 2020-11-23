@@ -14,12 +14,14 @@
         $(function () {
             $("#navbar").load("./rec/navbar.html");
             $("#addModal").load("./rec/addProductList.html")
-
-            $.get("./rec/product.html", data => {
-                for (var i = 0; i < 5; i++) {
-                    $("#product-list").append(data);
-                }
-            })
+            $.ajax({url:"http://localhost:4000/api/products/", type:"GET",
+                success:function(data,status,request){
+                data.map(producto=>{
+                    $("#product-list").append(getProducts(producto));
+                })
+                console.log(request.getAllResponseHeaders());
+            },error:function(res,errorStatus,error)
+            {console.log(errorStatus)} })
 
             $("#footer").load("./rec/footer.html");
             $("#loginRegis").load("./rec/loginRegister.html");
@@ -36,7 +38,7 @@
     <div id="addModal"></div>
 
     <div id="product-list" class="row m-0 w-100">
-
+        
     </div>
 
     <div class="mb-5"></div>

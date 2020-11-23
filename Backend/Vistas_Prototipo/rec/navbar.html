@@ -9,10 +9,20 @@
         transform: scale3d(1.05, 1.05, 1.05);
     }
 </style>
-
+<script src="./js/helper.js"></script>
 <script>
-    $(function(){
-        
+    $(function () {
+
+        //GET CATEGORIES
+        $.ajax({
+            url: "http://localhost:4000/api/categories/", type: "GET",
+            success: function (data, status, request) {
+                data.map(data => {
+                    $("#Categories-List").append(getCategories(data));
+                })
+
+            }, error: function (res, errorStatus, error) { console.log(errorStatus) }
+        })
     })
 </script>
 
@@ -41,12 +51,7 @@
                     aria-haspopup="true" aria-expanded="false">
                     Categorias
                 </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="./categoriaProducto.html">RAM</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="./categoriaProducto.html">Tarjetas Gráficas</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="./categoriaProducto.html">Gabinetes</a>
+                <div id="Categories-List" class="dropdown-menu" aria-labelledby="navbarDropdown">
                 </div>
             </li>
 
