@@ -19,7 +19,7 @@ listsCtrl.createList = async (req, res) => {
     try {
 
         const user = await User.findOne({_id: req.userId},);
-
+        
         if (!user) return res.status(400).json({ status: 'No tiene permitido crear listas' });
 
         const newList = new List(req.body);
@@ -40,7 +40,15 @@ listsCtrl.createList = async (req, res) => {
 
 listsCtrl.getList = async (req, res) => {
     try {
-        const list = await List.findOne({$and:[{ _id: req.params.id },{pubpriv: true}]});
+        var username = "";
+        
+        const user = await User.findOne({_id: req.userId},);
+        
+        if (!user) username="";
+        else username=user.username;
+
+        const list = await List.findOne({$and:[
+            { _id: req.params.id },{$or: [{pubpriv: true}, {username: username}]}]});
         res.json(list);
     }
     catch (e) {
