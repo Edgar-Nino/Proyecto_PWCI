@@ -2,6 +2,7 @@ categoriesCtrl = {};
 
 const Category = require('../models/categories')
 const User = require('../models/users')
+const Product = require('../models/products')
 
 categoriesCtrl.getCategories = async (req, res) => {
     try {
@@ -13,11 +14,21 @@ categoriesCtrl.getCategories = async (req, res) => {
     }
 }
 
+categoriesCtrl.getCatProducts = async (req, res) => {
+    try {
+        const catProducts = await Product.find({category:req.params.id})
+        res.json(catProducts);
+    }
+    catch (e) {
+        res.status(500).json({ status: 'No se pudieron conseguir las categorias' })
+    }
+}
+
 categoriesCtrl.createCategory = async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.userId },);
 
-        if ((!user) || (user.type != 0)) return res.status(400).json({ status: 'No tiene permitido crear productos' });
+        if ((!user) || (user.type != 0)) return res.status(400).json({ status: 'No tiene permitido crear categorias' });
 
         const newCategory = new Category(req.body);
 
@@ -45,7 +56,7 @@ categoriesCtrl.editCategory = async (req, res) => {
     try {
         const user = await User.findOne({_id: req.userId},);
 
-        if ((!user)||(user.type!=0)) return res.status(400).json({ status: 'No tiene permitido crear productos' });
+        if ((!user)||(user.type!=0)) return res.status(400).json({ status: 'No tiene permitido crear categorias' });
 
         await Category.findByIdAndUpdate(req.params.id, req.body);
         res.json({ status: 'Se actualizo la categoria' });
@@ -59,7 +70,7 @@ categoriesCtrl.deleteCategory = async (req, res) => {
     try {
         const user = await User.findOne({_id: req.userId},);
 
-        if ((!user)||(user.type!=0)) return res.status(400).json({ status: 'No tiene permitido crear productos' });
+        if ((!user)||(user.type!=0)) return res.status(400).json({ status: 'No tiene permitido crear categorias' });
 
         await Category.findByIdAndDelete(req.params.id);
         res.json({ status: 'Se borro la categoria' })
