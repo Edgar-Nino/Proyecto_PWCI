@@ -11,44 +11,57 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <script>
-        $(function () {
+        $(async function () {
             $("#navbar").load("./rec/navbar.html");
             $("#modalAddList").load("./rec/addList.html")
 
+            try {
+                await $.ajax({
+                    url: "http://localhost:4000/api/lists/myLists", type: "POST",
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    success: function (data, status, request) {
+                        data.map(data => {
+                            $("#list-list").append(getLists(data));
+                        })
+                        console.log(request.getAllResponseHeaders());
+                    }, error: function (res, errorStatus, error) { console.log(errorStatus) }
+                })
+            } catch (e) {
+                console.log(e)
+            }
 
 
-            $.get("./rec/list.html", data => {
-                for (var i = 0; i < 5; i++) {
-                    $("#list-list").append(data);
-                }
-            });
 
             $.get("./rec/emptyList.html", data => {
                 $("#list-list").append(data);
             });
 
+
+
             $(document).on("click", "#newLista", function () {
                 $("#AddList").modal("show")
             })
 
-            $(document).on("submit",'#formAddList',function(e){
+            $(document).on("submit", '#formAddList', function (e) {
                 var form = $('#formAddList')[0]; // You need to use standard javascript object here
                 var formData = new FormData(form);
-
                 $.ajax({
                     url: 'http://localhost:4000/api/lists/',
                     data: formData,
-                    headers: {
-                        "auth-token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmE3OTkxNGQwMDZjODBlOGM0Nzc1YmIiLCJpYXQiOjE2MDYwMjA2NTN9.tNZLOn9hzzIJz9mcCHWK3lPTVSVPUYAGs9UIl7vmksY"
-                    },
                     type: 'POST',
+                    xhrFields: {
+                        withCredentials: true
+                    },
                     contentType: false,
                     processData: false,
-                    success: function(status){
+                    success: function (data) {
                         $("#AddList").modal("hide");
-                        alert(status);
+                        debugger
+                        alert(data.status);
                     },
-                    error:function(status){
+                    error: function (status) {
                         $("#AddList").modal("hide");
                         alert(status);
                     }
@@ -69,6 +82,8 @@
 <body>
     <div id="navbar">
     </div>
+
+    
     <div id="modalAddList"></div>
 
     <div id="list-list" class="row w-100 m-0"></div>

@@ -25,11 +25,15 @@
             },error:function(res,errorStatus,error)
             {console.log(errorStatus)} }) 
 
-            $.get("./rec/product.html", data => {
-                for (var i = 0; i < 5; i++) {
-                    $("#product-list").append(data);
-                }
-            })
+            $.ajax({url:"http://localhost:4000/api/products/", type:"GET",
+                success:function(data,status,request){
+                data.map(data=>{
+                    $("#product-list").append(getLists(data));
+
+                })
+                console.log(request.getAllResponseHeaders());
+            },error:function(res,errorStatus,error)
+            {console.log(errorStatus)} }) 
 
             $("#footer").load("./rec/footer.html")
 

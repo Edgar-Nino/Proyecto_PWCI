@@ -10,9 +10,9 @@
     <link rel="stylesheet" href="css/lista.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
+    <script src="./js/helper.js"></script>
     <script>
-        $(function () {
+        $(async function () {
             $("#navbar").load("./rec/navbar.html");
 
             $.get("./rec/list-product.html", data => {
@@ -21,6 +21,20 @@
                 }
             })
 
+            var listaID = getUrlParameter("lista");
+
+            if (!listaID) {
+                window.location.replace("./index.html")
+            }
+
+            $.ajax({
+                url: "http://localhost:4000/api/lists/" + listaID, type: "GET",
+                xhrFields: { withCredentials: true },
+                crossDomain: true,
+                success: function (data, status, request) {
+                    $("#bigList").append(getBigList(data));
+                }, error: function (res, errorStatus, error) { console.log(errorStatus) }
+            })
             $("#footer").load("./rec/footer.html");
             $("#loginRegis").load("./rec/loginRegister.html");
         })
@@ -31,35 +45,40 @@
         crossorigin="anonymous"></script>
 </head>
 
-<body>
+<body style="overflow-y:hidden;">
     <div id="navbar"></div>
 
     <div class="row m-0 w-100">
-        <div id="bigList" class="col-sm-12 col-lg-4">
-            <div class="shadow card">
-                <img class="card-img-top h-100 w-100" src="https://vistapointe.net/images/white-wallpaper-8.jpg"
-                    alt="Card image cap">
-                <div class="card-body">
-                    <h5 class="card-title">Nombre Lista</h5>
-                    <p class="card-text">Descripcion</p>
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><small>Username</small></li>
-                </ul>
-                <div class="card-footer">
-                    <small class="text-muted">Fecha</small>
-                </div>
-            </div>
+        <div id="bigList" class="my-auto col-sm-12 col-lg-4">
+
         </div>
         <div id="items" class="col-sm-12 col-lg-8 ">
             <div id="list-products-list" class="row m-0 w-100">
-                
+
             </div>
         </div>
     </div>
     <div class="mb-5"></div>
     <div id="footer"></div>
     <div id="loginRegis"></div>
+
+    <style>
+        #items::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        /* #items::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        } */
+
+        #items::-webkit-scrollbar-thumb {
+            background: rgb(219, 223, 255);
+            background: linear-gradient(0deg, rgba(219, 223, 255, 1) 0%, rgba(231, 255, 230, 1) 100%);
+            border-radius: 10px;
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+        }
+    </style>
 </body>
 
 </html>

@@ -23,6 +23,36 @@
 
             }, error: function (res, errorStatus, error) { console.log(errorStatus) }
         })
+
+        $.ajax({
+            url: "http://localhost:4000/api/users/v1/profile", type: "GET",
+            xhrFields: { withCredentials: true },
+            crossDomain: true,
+            success: function (data, status, request) {
+                $("#LoginButton").remove();
+                $("#User_Icon").append(userDropdown(data));
+                $("#navbar-list-items").append(getList("myList"))
+                if (data.type == 0) {
+                    $("#navbar-list-items").append(getList("Admin"))
+                }
+            }, error: function (res, errorStatus, error) {
+            }
+        })
+
+        $(document).on("click", "#LogOut", function () {
+            $.ajax({
+                url: "http://localhost:4000/api/users/v1/logOut", type: "GET",
+                xhrFields: { withCredentials: true },
+                crossDomain: true,
+                success: function (data, status, request) {
+                    alert("Se hizo el logout con exito");
+                    window.location.reload();
+                }, error: function (res, errorStatus, error) {
+                    // alert(res.responseJSON.status)
+                }
+            })
+        })
+
     })
 </script>
 
@@ -34,7 +64,7 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
+        <ul id="navbar-list-items" class="navbar-nav mr-auto">
             <li class="nav-item">
                 <a class="nav-link" href="./index.html">Home</a>
             </li>
@@ -55,15 +85,36 @@
                 </div>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link" href="./misListas.html">Mis Listas</a>
-            </li>
         </ul>
         <form class="form-inline my-2 my-lg-0">
             <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
             <button class="btn btn-outline-success mr-sm-2 my-2 my-sm-0" type="submit">Search</button>
         </form>
-        <button class="btn btn-outline-success mr-sm-2 my-2 my-sm-0" data-toggle="modal"
+
+        <button id="LoginButton" class="btn btn-outline-success mr-sm-2 my-2 my-sm-0" data-toggle="modal"
             data-target="#modalLRForm">Login</button>
+
+        <div id="User_Icon" class="dropdown my-lg-0 mr-sm-2 my-2 my-sm-0">
+
+        </div>
+
     </div>
 </nav>
+
+<style>
+    ::-webkit-scrollbar {
+        width: 20px;
+    }
+
+    ::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgb(219, 223, 255);
+        background: linear-gradient(0deg, rgba(219, 223, 255, 1) 0%, rgba(231, 255, 230, 1) 100%);
+        border-radius: 10px;
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+    }
+</style>

@@ -1,90 +1,108 @@
-<!--Modal: Login / Register Form-->
-<div class="modal fade" id="modalLRForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <!--Content-->
-      <div class="modal-content">
-  
-        <!--Modal cascading tabs-->
-        <div class="modal-c-tabs">
-  
-          <!-- Nav tabs -->
-          <ul class="nav nav-tabs md-tabs tabs-2 light-blue darken-3" role="tablist">
-            <li class="nav-item">
-              <a class="nav-link active" data-toggle="tab" href="#login" role="tab">Login</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#register" role="tab">Register</a>
-            </li>
-          </ul>
-  
-          <!-- Tab panels -->
-          <div class="tab-content">
-            <!--Panel 7-->
-            <div class="tab-pane fade in show active" id="login" role="tabpanel">
-  
-              <!--Body-->
-              <div class="modal-body">
+<script>
+  $(function () {
+    $("#LoginFormulario").on("submit", function (e) {
 
+      var form = $('#LoginFormulario').serialize();
+
+      $.ajax({
+        url: 'http://localhost:4000/api/users/logIn',
+        data: form,
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        dataType: "JSON",
+        xhrFields: { withCredentials: true },
+        crossDomain: true,
+        type: 'POST',
+        success: function (data, status, request) {
+          $("#modalLRForm").modal("hide");
+          alert("Ingreso correctamente");
+          e.preventDefault();
+          window.location.reload();
+        },
+        error: function (data, status, request) {
+          alert(data.responseJSON.status)
+        }
+      });
+
+      e.preventDefault();
+      return false;
+
+    })
+  })
+</script>
+
+<div class="modal fade" id="modalLRForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-c-tabs">
+        <ul class="nav nav-tabs md-tabs tabs-2 light-blue darken-3" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#login" role="tab">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#register" role="tab">Register</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane fade in show active" id="login" role="tabpanel">
+            <div class="modal-body">
+              <form method="post" id="LoginFormulario">
                 <div class="form-group">
                   <label data-error="wrong" data-success="right" for="usernameEmailL">Nombre de usuario o email</label>
-                  <input type="text" id="usernameEmailL" class="form-control form-control-lg validate">
+                  <input type="text" name="identifier" id="usernameEmailL"
+                    class="form-control form-control-lg validate">
                 </div>
-  
                 <div class="form-group">
                   <label data-error="wrong" data-success="right" for="passwordL">Contraseña</label>
-                  <input type="password" id="passwordL" class="form-control form-control-lg validate">
+                  <input type="password" name="password" id="passwordL" class="form-control form-control-lg validate">
                 </div>
                 <div class="form-group text-center">
                   <button class="btn btn-info p-3">Ingresa</button>
                 </div>
-              </div>
-              <!--Footer-->
-              <div class="modal-footer">
-                <div class="options text-center text-md-right mt-1">
-                  <p>¿Todavia no tienes cuenta? <a href="#" class="blue-text">Registrate</a></p>
-                </div>
-                <button type="button" class="btn btn-outline-info waves-effect ml-auto" data-dismiss="modal">Cerrar</button>
-              </div>
-  
+              </form>
             </div>
-
-            <div class="tab-pane fade" id="register" role="tabpanel">
-              <div class="modal-body">
-                <div class="form-group">
-                  <label data-error="wrong" data-success="right" for="usernameR">Nombre de usuario</label>
-                  <input type="text" id="usernameR" class="form-control form-control-lg validate">
-                </div>
-                <div class="form-group">
-                  <label data-error="wrong" data-success="right" for="emailR">Email</label>
-                  <input type="email" id="emailR" class="form-control form-control-lg validate">
-                </div>
-  
-                <div class="form-group">
-                  <label data-error="wrong" data-success="right" for="passwordR">Contraseña</label>
-                  <input type="password" id="passwordR" class="form-control form-control-lg validate">
-                </div>
-  
-                <div class="form-group">
-                  <label data-error="wrong" data-success="right" for="passwordRR">Repite la contraseña</label>
-                  <input type="password" id="passwordRR" class="form-control form-control-lg validate">
-                </div>
-  
-                <div class="text-center form-group">
-                  <button class="btn btn-info p-3">Registrate</button>
-                </div>
-  
+            <div class="modal-footer">
+              <div class="options text-center text-md-right mt-1">
+                <p>¿Todavia no tienes cuenta? <a href="#" class="blue-text">Registrate</a></p>
               </div>
-              <div class="modal-footer">
-                <div class="options text-right">
-                  <p class="pt-1">¿Ya tienes una cuenta? <a href="#" class="blue-text">Ingresa</a></p>
-                </div>
-                <button type="button" class="btn btn-outline-info ml-auto" data-dismiss="modal">Cerrar</button>
-              </div>
+              <button type="button" class="btn btn-outline-info waves-effect ml-auto"
+                data-dismiss="modal">Cerrar</button>
             </div>
           </div>
-  
+          <div class="tab-pane fade" id="register" role="tabpanel">
+            <div class="modal-body">
+              <div class="form-group">
+                <label data-error="wrong" data-success="right" for="usernameR">Nombre de usuario</label>
+                <input type="text" id="usernameR" class="form-control form-control-lg validate">
+              </div>
+              <div class="form-group">
+                <label data-error="wrong" data-success="right" for="emailR">Email</label>
+                <input type="email" id="emailR" class="form-control form-control-lg validate">
+              </div>
+
+              <div class="form-group">
+                <label data-error="wrong" data-success="right" for="passwordR">Contraseña</label>
+                <input type="password" id="passwordR" class="form-control form-control-lg validate">
+              </div>
+
+              <div class="form-group">
+                <label data-error="wrong" data-success="right" for="passwordRR">Repite la contraseña</label>
+                <input type="password" id="passwordRR" class="form-control form-control-lg validate">
+              </div>
+
+              <div class="text-center form-group">
+                <button class="btn btn-info p-3">Registrate</button>
+              </div>
+
+            </div>
+            <div class="modal-footer">
+              <div class="options text-right">
+                <p class="pt-1">¿Ya tienes una cuenta? <a href="#" class="blue-text">Ingresa</a></p>
+              </div>
+              <button type="button" class="btn btn-outline-info ml-auto" data-dismiss="modal">Cerrar</button>
+            </div>
+          </div>
         </div>
       </div>
-      <!--/.Content-->
     </div>
   </div>
+</div>
