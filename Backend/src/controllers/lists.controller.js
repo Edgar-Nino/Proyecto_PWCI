@@ -1,13 +1,27 @@
 listsCtrl = {};
 
-const fs = require('fs')
+const fs = require('fs');
 
 const List = require('../models/lists')
+const Product = require('../models/products')
 const User = require('../models/users')
 
 listsCtrl.getLists = async (req, res) => {
     try {
-        const lists = await List.find({pubpriv:true})
+        const lists = await List.find({ pubpriv: true })
+        res.json(lists);
+    }
+    catch (e) {
+        res.status(500).json({ status: 'No se pudieron conseguir las listas' })
+    }
+}
+
+listsCtrl.getListsNav = async (req, res) => {
+    try {
+        var numberPage = (req.params.id)?req.params.id:1;
+        var numberDocs = 6 * numberPage;
+        var numberSkipped = 6 * ( numberPage-1)
+        const lists = await List.find({ pubpriv: true }).skip(numberSkipped).limit(numberDocs)
         res.json(lists);
     }
     catch (e) {
@@ -18,8 +32,8 @@ listsCtrl.getLists = async (req, res) => {
 listsCtrl.createList = async (req, res) => {
     try {
 
-        const user = await User.findOne({_id: req.userId},);
-        
+        const user = await User.findOne({ _id: req.userId },);
+
         if (!user) return res.status(400).json({ status: 'No tiene permitido crear listas' });
 
         const newList = new List(req.body);
@@ -34,22 +48,54 @@ listsCtrl.createList = async (req, res) => {
     }
     catch (e) {
         res.status(500).json({ status: "No se pudo crear la lista" })
-        await fs.unlink('./src/public/uploads/'+ req.file.filename, (err)=>{})
+        await fs.unlink('./src/public/uploads/' + req.file.filename, (err) => { })
     }
 }
 
 listsCtrl.getList = async (req, res) => {
     try {
-        var username = "";
-        
-        const user = await User.findOne({_id: req.userId},);
-        
-        if (!user) username="";
-        else username=user.username;
-
-        const list = await List.findOne({$and:[
-            { _id: req.params.id },{$or: [{pubpriv: true}, {username: username}]}]});
+        const list = await List.findOne({
+            $and: [
+                { _id: req.params.id }, { $or: [{ pubpriv: true }, { user_id: req.userId }] }]
+        });
         res.json(list);
+    }
+    catch (e) {
+        res.status(500).json({ status: "No se pudo conseguir la lista" })
+    }
+}
+
+listsCtrl.getListProducts = async (req, res) => {
+    try {
+        const list = await List.findOne({ _id: req.params.id })
+
+        if (!list) return res.status(400).json({ status: "La lista que estas buscando no existe" })
+        
+        if ((list.user_id != req.userId) && (!list.pubpriv)) return res.status(400).json({ status: "Los productos de la lista que estas buscando son privados" })
+
+        const products = await Product.find({ id_list: req.params.id })
+
+        res.json(products);
+    }
+    catch (e) {
+        console.log(e)
+        res.status(500).json({ status: 'No se pudieron conseguir los productos' })
+    }
+}
+
+listsCtrl.isMyList = async (req, res) => {
+    try {
+        const list = await List.findOne({
+            $and: [
+                { _id: req.params.id }, { user_id: req.userId }]
+        });
+
+        if (list) {
+            res.json({ isMyList: true });
+        } else {
+            res.json({ isMyList: false });
+        }
+
     }
     catch (e) {
         res.status(500).json({ status: "No se pudo conseguir la lista" })
@@ -58,33 +104,54 @@ listsCtrl.getList = async (req, res) => {
 
 listsCtrl.editList = async (req, res) => {
     try {
-        
+
         const list = await List.findOne({ _id: req.params.id });
         if (req.userId != list.user_id) return res.status(400).json({ status: 'No tienes privilegios para editar esta lista' })
 
-        const user = await User.findOne({_id: req.userId},);
+        const user = await User.findOne({ _id: req.userId },);
 
         req.body.imgURL = req.file.filename;
+        req.body.user_id = req.userId;
         req.body.username = user.username;
 
         await List.findByIdAndUpdate(req.params.id, req.body);
 
-        await fs.unlink('./src/public/uploads/'+ list.imgURL, (err)=>{console.log(err)})
+        await fs.unlink('./src/public/uploads/' + list.imgURL, (err) => { console.log(err) })
 
         res.json({ status: 'Se actualizo la lista' });
     }
     catch (e) {
         res.status(500).json({ status: 'No se actualizo la lista' })
-        await fs.unlink('./src/public/uploads/'+ req.file.filename, (err)=>{})
+        await fs.unlink('./src/public/uploads/' + req.file.filename, (err) => { })
+    }
+}
+
+listsCtrl.searchList = async (req, res) => {
+    try {
+        var numberPage = (req.params.page)?req.params.page:1;
+        var numberDocs = 6 * numberPage;
+        var numberSkipped = 6 * ( numberPage-1)
+
+        var string = req.params.id;
+        var regex = new RegExp([ string])
+
+        const lists = await List.find({ 
+            $and: [{name:{ $regex: regex, $options: 'i' }}, { $or: [{ pubpriv: true }, { user_id: req.userId }] }] }
+            ).skip(numberSkipped).limit(numberDocs)
+        res.json(lists);
+    }
+    catch (e) {
+        res.status(500).json({ status: 'No se pudieron conseguir las listas' })
     }
 }
 
 listsCtrl.myLists = async (req, res) => {
     try {
-        const lists = await List.find({user_id:req.userId})
+        const lists = await List.find({ user_id: req.userId })
         res.json(lists);
     }
     catch (e) {
+        console.log(e);
         res.status(500).json({ status: 'No se pudieron conseguir las listas' })
     }
 }
@@ -94,9 +161,12 @@ listsCtrl.deleteList = async (req, res) => {
         const list = await List.findOne({ _id: req.params.id });
         if (req.userId != list.user_id) return res.status(400).json({ status: 'No tienes privilegios para eliminar esta lista' })
 
-        await List.findByIdAndDelete(req.params.id);
 
-        await fs.unlink('./src/public/uploads/'+ list.imgURL, (err)=>{console.log(err)})
+        var oldList = await List.findByIdAndDelete(req.params.id);
+
+        await Product.deleteMany({ id_list: oldList._id });
+
+        await fs.unlink('./src/public/uploads/' + list.imgURL, (err) => { console.log(err) })
 
         res.json({ status: 'Se borro la lista' })
     }

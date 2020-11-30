@@ -1,6 +1,7 @@
 productsCtrl = {};
 
 const Product = require('../models/products')
+const List = require('../models/lists')
 const User = require('../models/users')
 
 const fs = require('fs')
@@ -15,22 +16,41 @@ productsCtrl.getProducts = async (req, res) => {
     }
 }
 
+productsCtrl.getProductsNav = async (req, res) => {
+    try {
+        var numberPage = (req.params.id)?req.params.id:1;
+        var numberDocs = 6 * numberPage;
+        var numberSkipped = 6 * ( numberPage-1)
+        const products = await Product.find().skip(numberSkipped).limit(numberDocs)
+        res.json(products);
+    }
+    catch (e) {
+        res.status(500).json({ status: 'No se pudieron conseguir los productos' })
+    }
+}
+
 productsCtrl.createProduct = async (req, res) => {
     try {
 
         const user = await User.findOne({_id: req.userId},);
 
-        if ((!user)||(user.type!=0)) return res.status(400).json({ status: 'No tiene permitido crear productos' });
+        if (!user) return res.status(400).json({ status: 'No tiene permitido crear productos' });
+
+        const list = await List.findOne({_id: req.body.id_list},);
+
+        if (!list) return res.status(400).json({ status: 'No existe la lista donde quieres poner tu producto' });
 
         const newProduct = new Product(req.body);
 
         newProduct.imgURL = req.file.filename;
+        newProduct.user_id = req.userId;
 
         await newProduct.save();
 
         res.send({ status: 'Se creo el producto' });
     }
     catch (e) {
+        console.log(e);
         res.status(500).json({ status: "No se pudo crear el producto" })
         await fs.unlink('./src/public/uploads/'+ req.file.filename, (err)=>{})
     }
@@ -50,8 +70,15 @@ productsCtrl.editProduct = async (req, res) => {
     try {
         const product = await Product.findOne({ _id: req.params.id });
 
+        if(!product)return res.status(400).json({ status: 'No se encontro el producto a actualizar' });
+
+        const list = await List.findOne({ _id: product.id_list});
+
         const user = await User.findOne({_id: req.userId},);
-        if ((!user)||(user.type!=0)) return res.status(400).json({ status: 'No tiene permitido actualizar productos' });
+        if (!user||user._id!=list.user_id) return res.status(400).json({ status: 'No tiene permitido actualizar productos' });
+
+        req.body.user_id = user._id;
+        req.body.id_list = product.id_list;
 
         req.body.imgURL = req.file.filename;
 
@@ -70,11 +97,13 @@ productsCtrl.editProduct = async (req, res) => {
 productsCtrl.deleteProduct = async (req, res) => {
     try {
         const user = await User.findOne({_id: req.userId},);
-        if ((!user)||(user.type!=0)) return res.status(400).json({ status: 'No tiene permitido borrar productos' });
+        if (!user) return res.status(400).json({ status: 'No tiene permitido borrar productos' });
 
-        await Product.findByIdAndDelete(req.params.id);
-        res.json({ status: 'Se borro el producto' })
+        var product = await Product.findByIdAndDelete(req.params.id);
+
         await fs.unlink('./src/public/uploads/'+ product.imgURL, (err)=>{console.log(err)})
+
+        res.json({ status: 'Se borro el producto' })
     }
     catch (e) {
         res.status(500).json({ status: 'No se borro el producto' })
