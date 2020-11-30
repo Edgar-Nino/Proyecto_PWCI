@@ -9,35 +9,25 @@
         transform: scale3d(1.05, 1.05, 1.05);
     }
 </style>
-<script src="./js/helper.js"></script>
+<script src="./js/validation.js"></script>
 <script>
     $(function () {
-
-        //GET CATEGORIES
-        $.ajax({
-            url: "http://localhost:4000/api/categories/", type: "GET",
-            success: function (data, status, request) {
-                data.map(data => {
-                    $("#Categories-List").append(getCategories(data));
-                })
-
-            }, error: function (res, errorStatus, error) { console.log(errorStatus) }
-        })
-
-        $.ajax({
-            url: "http://localhost:4000/api/users/v1/profile", type: "GET",
-            xhrFields: { withCredentials: true },
-            crossDomain: true,
-            success: function (data, status, request) {
-                $("#LoginButton").remove();
-                $("#User_Icon").append(userDropdown(data));
-                $("#navbar-list-items").append(getList("myList"))
-                if (data.type == 0) {
-                    $("#navbar-list-items").append(getList("Admin"))
+        try {
+            $.ajax({
+                url: "http://localhost:4000/api/users/v1/profile", type: "GET",
+                xhrFields: { withCredentials: true },
+                crossDomain: true,
+                success: function (data, status, request) {
+                    $("#LoginButton").remove();
+                    $("#User_Dropdown").append(userDropdown(data));
+                    $("#User_Icon").append(getUserImage(data));
+                    $("#navbar-list-items").append(getList("myList"))
+                }, error: function (res, errorStatus, error) {
                 }
-            }, error: function (res, errorStatus, error) {
-            }
-        })
+            })
+        } catch {
+
+        }
 
         $(document).on("click", "#LogOut", function () {
             $.ajax({
@@ -48,9 +38,35 @@
                     alert("Se hizo el logout con exito");
                     window.location.reload();
                 }, error: function (res, errorStatus, error) {
-                    // alert(res.responseJSON.status)
+                    alert(res.responseJSON.status)
                 }
             })
+        })
+
+        $(document).on("click", "#buttonDeleteUser", function () {
+            if (confirm("¿Seguro que quiere eliminar su cuenta?")) {
+                $.ajax({
+                    url: "http://localhost:4000/api/users/", type: "DELETE",
+                    xhrFields: { withCredentials: true },
+                    crossDomain: true,
+                    success: function (data, status, request) {
+                        alert(data.status);
+                        window.location.reload();
+                    }, error: function (res, errorStatus, error) {
+                        alert(res.responseJSON.status)
+                    }
+                })
+            }
+        })
+
+        $(document).on("click", "#BtnSearch", function () {
+            var text = $("#SearchText").val();
+            var userList = $('#UserLists option:selected').val()
+            if (userList == "Listas") {
+                window.location.replace("./search.html?search=" + text)
+            } else {
+                window.location.replace("./searchuser.html?search=" + text)
+            }
         })
 
     })
@@ -76,27 +92,26 @@
                 <a class="nav-link" href="./productos.html">Productos</a>
             </li>
 
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">
-                    Categorias
-                </a>
-                <div id="Categories-List" class="dropdown-menu" aria-labelledby="navbarDropdown">
-                </div>
-            </li>
-
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success mr-sm-2 my-2 my-sm-0" type="submit">Search</button>
-        </form>
+        <div class="form-inline my-2 my-lg-0">
+            <select class="custom-select" name="UserLists" id="UserLists">
+                <option value="Listas">Listas</option>
+                <option value="Usuarios">Usuarios</option>
+            </select>
+
+            <input id="SearchText" class="form-control mr-sm-2" name="name" type="text" placeholder="Search"
+                aria-label="Search">
+            <button id="BtnSearch" class="btn btn-outline-success mr-sm-2 my-2 my-sm-0" type="submit">Search</button>
+        </div>
 
         <button id="LoginButton" class="btn btn-outline-success mr-sm-2 my-2 my-sm-0" data-toggle="modal"
             data-target="#modalLRForm">Login</button>
 
-        <div id="User_Icon" class="dropdown my-lg-0 mr-sm-2 my-2 my-sm-0">
+        <div id="User_Dropdown" class="dropdown my-lg-0 mr-sm-2 my-2 my-sm-0">
 
         </div>
+
+        <div id="User_Icon"></div>
 
     </div>
 </nav>
@@ -118,3 +133,200 @@
         -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
     }
 </style>
+
+
+<script>
+    $(function () {
+        $("#LoginFormulario").on("submit", function (e) {
+
+            var form = $('#LoginFormulario').serialize();
+
+            $.ajax({
+                url: 'http://localhost:4000/api/users/logIn',
+                data: form,
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                dataType: "JSON",
+                xhrFields: { withCredentials: true },
+                crossDomain: true,
+                type: 'POST',
+                success: function (data, status, request) {
+                    $("#modalLRForm").modal("hide");
+                    alert("Ingreso correctamente");
+                    window.location.reload();
+                },
+                error: function (data, status, request) {
+                    alert(data.responseJSON.status)
+                }
+            });
+
+            e.preventDefault();
+            return false;
+
+        })
+
+
+    })
+    $(document).on("submit", "#RegisterForm", function (e) {
+        var validationSuccess = true;
+        var form = $('#RegisterForm')[0];
+        var formData = new FormData(form)
+
+        var usernameR = $("#usernameR").val();
+        var emailR = $("#usernameR").val();
+        var passwordR = $("#passwordR").val();
+        var passwordRR = $("#passwordRR").val();
+
+        if(!validate_length(usernameR,3))
+        {
+            validationSuccess = false;
+            alert("Ingresa un username mayor o igual a 3 caracteres")
+        }
+        if(!validate_password(passwordR))
+        {
+            validationSuccess = false;
+            alert('Ingresa una contraseña con 8 o más caracteres, que incluya una minuscula, una mayuscula y un caracter especial (!#"$%&/()=?¡¿)')
+        }
+        if(passwordR!=passwordR)
+        {
+            validationSuccess=false;
+            alert("La contraseñas tienen que coincidir")
+        }
+        if ($("#fileAvatar").get(0).files.length === 0) {
+            alert("Ingresa un avatar");
+            validationSuccess = false;
+        }
+        if (validationSuccess) {
+            $.ajax({
+                url: 'http://localhost:4000/api/users/signUp',
+                data: formData,
+                dataType: "JSON",
+                xhrFields: { withCredentials: true },
+                crossDomain: true,
+                type: 'POST',
+                processData: false,
+                contentType: false,
+                success: function (data, status, request) {
+                    debugger
+                    $("#modalLRForm").modal("hide");
+                    alert("Ingreso correctamente");
+                    window.location.reload();
+                },
+                error: function (data, status, request) {
+                    alert(data.responseJSON.status)
+                }
+            });
+        }
+        e.preventDefault();
+        return false;
+    })
+</script>
+
+<div class="modal fade" id="modalLRForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-c-tabs">
+                <ul class="nav nav-tabs md-tabs tabs-2 light-blue darken-3" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#login" role="tab">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#register" role="tab">Register</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade in show active" id="login" role="tabpanel">
+                        <div class="modal-body">
+                            <form method="post" id="LoginFormulario">
+                                <div class="form-group">
+                                    <label data-error="wrong" data-success="right" for="usernameEmailL">Nombre de
+                                        usuario o email</label>
+                                    <input type="text" name="identifier" id="usernameEmailL"
+                                        class="form-control form-control-lg validate">
+                                </div>
+                                <div class="form-group">
+                                    <label data-error="wrong" data-success="right" for="passwordL">Contraseña</label>
+                                    <input type="password" name="password" id="passwordL"
+                                        class="form-control form-control-lg validate">
+                                </div>
+                                <div class="form-group text-center">
+                                    <button class="btn btn-info p-3">Ingresa</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="options text-center text-md-right mt-1">
+                                <p>¿Todavia no tienes cuenta? <a href="#" class="blue-text">Registrate</a></p>
+                            </div>
+                            <button type="button" class="btn btn-outline-info waves-effect ml-auto"
+                                data-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="register" role="tabpanel">
+                        <form id="RegisterForm" class="modal-body">
+                            <div class="form-group">
+                                <label data-error="wrong" data-success="right" for="usernameR">Nombre de usuario</label>
+                                <input type="text" id="usernameR" min="3" required name="username"
+                                    class="form-control form-control-lg validate">
+                            </div>
+                            <div class="form-group">
+                                <label data-error="wrong" data-success="right" for="emailR">Email</label>
+                                <input type="email" name="email" required id="emailR"
+                                    class="form-control form-control-lg validate">
+                            </div>
+
+                            <div class="form-group">
+                                <label data-error="wrong" data-success="right" for="passwordR">Contraseña</label>
+                                <input type="password" name="password" required id="passwordR"
+                                    class="form-control form-control-lg validate">
+                            </div>
+
+                            <div class="form-group">
+                                <label data-error="wrong" data-success="right" for="passwordRR">Repite la
+                                    contraseña</label>
+                                <input type="password" required id="passwordRR"
+                                    class="form-control form-control-lg validate">
+                            </div>
+
+                            <div class="form-group">
+                                <label data-error="wrong" data-success="right" for="fileAvatar">Ingresa un
+                                    avatar</label>
+                                <input name="image" accept="image/*" id="fileAvatar" type="file"
+                                    onchange="validateImage('fileAvatar')" required id=" file"
+                                    class="form-control-file form-control-lg validate">
+                            </div>
+
+                            <div class="input-group mb-3">
+                                <div class="input-group-text">
+                                    <label for="seTiene">Publico o privado</label>
+                                </div>
+                                <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                                    <label class="btn btn-secondary active">
+                                        <input type="radio" value=true name="pubpriv" autocomplete="off"
+                                            checked>
+                                        Publico
+                                    </label>
+                                    <label class="btn btn-secondary">
+                                        <input type="radio" value=false name="pubpriv" autocomplete="off">
+                                        Privado
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="text-center form-group">
+                                <button class="btn btn-info p-3">Registrate</button>
+                            </div>
+
+                        </form>
+                        <div class="modal-footer">
+                            <div class="options text-right">
+                                <p class="pt-1">¿Ya tienes una cuenta? <a href="#" class="blue-text">Ingresa</a></p>
+                            </div>
+                            <button type="button" class="btn btn-outline-info ml-auto"
+                                data-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

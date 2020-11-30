@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listas</title>
+    <title>Busqueda</title>
 
     <link rel="stylesheet" href="css/bootstrap.min.css">
 
@@ -14,23 +14,28 @@
 
     <script>
         $(function () {
+            var search = getUrlParameter("search")||"";
+
+            $("#Title-Search").text("Resultados de tu busqueda: " + search)
+
             $("#navbar").load("./rec/navbar.html");
+            $("#footer").load("./rec/footer.html");
 
             var num = getUrlParameter("num") ? parseInt(getUrlParameter("num")) : 1
 
-            if(num==1)
-            {
-                $("#AnteriorBtn").prop("disabled",true)
+            if (num == 1) {
+                $("#AnteriorBtn").prop("disabled", true)
             }
 
             $.ajax({
-                url: "http://localhost:4000/api/lists/nav/" + num, type: "GET",
+                url: "http://localhost:4000/api/lists/search/" + search + "/"+num, type: "GET",
+                xhrFields: { withCredentials: true },
+                crossDomain: true,
                 success: function (data, status, request) {
                     if(data.length<6)
                     {
                         $("#SiguienteBtn").prop("disabled",true)
                     }
-
                     data.map(data => {
                         $("#list-list").append(getLists(data));
                     })
@@ -38,19 +43,16 @@
                 }, error: function (res, errorStatus, error) { console.log(errorStatus) }
             })
 
-            $("#footer").load("./rec/footer.html");
-
             $(document).on("click", "#AnteriorBtn", function () {
                 num--;
-                window.location.replace("./listas.html?num="+num)
+                window.location.replace("./search.html?num=" + num+"&search="+search)
             })
 
             $(document).on("click", "#SiguienteBtn", function () {
                 num++;
-                window.location.replace("./listas.html?num="+num)
+                window.location.replace("./search.html?num=" + num+"&search="+search)
             })
         })
-
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
@@ -61,9 +63,8 @@
 <body>
     <div id="navbar"></div>
 
-    <div id="list-list" class="row w-100 m-0">
-
-    </div>
+    <h1 id="Title-Search" class="shadow-sm bg-info text-center py-2">Resultados de tu busqueda: </h1>
+    <div id="list-list" class="row w-100 m-0"></div>
 
     <div class="row m-0">
         <button id="AnteriorBtn" class="btn-primary btn col-6">Anterior pagina</button>
@@ -71,14 +72,6 @@
     </div>
 
     <div class="mb-5"></div>
-
-    <style>
-        .card {
-            margin-top: 2vh;
-            margin-bottom: 2vh;
-        }
-    </style>
-
     <div id="footer"></div>
 </body>
 

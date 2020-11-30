@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busqueda</title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script src="./js/helper.js"></script>
+
+    <script>
+        $(function () {
+            var search = getUrlParameter("search")
+
+            $("#Title-Search").text("Resultados de tu busqueda: " + search)
+
+            $("#navbar").load("./rec/navbar.html");
+            $("#footer").load("./rec/footer.html");
+
+            $.ajax({
+                url: "http://localhost:4000/api/users/search/" + search, type: "GET",
+                xhrFields: { withCredentials: true },
+                crossDomain: true,
+                success: function (data, status, request) {
+                    data.map(data => {
+                        $("#list-list").append(getUsers(data));
+                    })
+                    console.log(request.getAllResponseHeaders());
+                }, error: function (res, errorStatus, error) { console.log(errorStatus) }
+            })
+        })
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div id="navbar"></div>
+
+    <h1 id="Title-Search" class="shadow-sm bg-info text-center py-2">Resultados de tu busqueda: </h1>
+    <div id="list-list" class="row w-100 m-0">
+
+        <div class="mb-5"></div>
+        <div id="footer"></div>
+</body>
+
+</html>

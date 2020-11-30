@@ -13,7 +13,6 @@
     <script>
         $(function () {
             $("#navbar").load("./rec/navbar.html");
-            $("#addModal").load("./rec/addProductList.html")
 
             $.ajax({url:"http://localhost:4000/api/lists/", type:"GET",
                 success:function(data,status,request){
@@ -28,7 +27,7 @@
             $.ajax({url:"http://localhost:4000/api/products/", type:"GET",
                 success:function(data,status,request){
                 data.map(data=>{
-                    $("#product-list").append(getLists(data));
+                    $("#product-list").append(getProducts(data));
 
                 })
                 console.log(request.getAllResponseHeaders());
@@ -36,9 +35,8 @@
             {console.log(errorStatus)} }) 
 
             $("#footer").load("./rec/footer.html")
-
-            $("#loginRegis").load("./rec/loginRegister.html");
         })
+        
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
@@ -58,7 +56,7 @@
         
     </div>
 
-    <h1 class="shadow-sm bg-info text-center py-2">Productos más recientes</h1>
+    <h1 class="shadow-sm bg-info text-center py-2">Ultimos productos agregados</h1>
     <div id="product-list" class="row m-0 w-100">
         
     </div>
@@ -66,8 +64,6 @@
 
     <div class="mb-5"></div>
     <div id="footer"></div>
-
-    <div id="loginRegis"></div>
 
 </body>
 

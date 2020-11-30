@@ -14,17 +14,45 @@
     <script>
         $(async function () {
             $("#navbar").load("./rec/navbar.html");
-
-            $.get("./rec/list-product.html", data => {
-                for (var i = 0; i < 5; i++) {
-                    $("#list-products-list").append(data);
-                }
-            })
+            $("#modList").load("./rec/navbar.html");
+            $("#footer").load("./rec/footer.html");
+            $("#modListDiv").load("./rec/modList.html");
+            $("#modProductDiv").load("./rec/modProduct.html");
 
             var listaID = getUrlParameter("lista");
-
+            var isMyList = false;
             if (!listaID) {
+                debugger
                 window.location.replace("./index.html")
+            }
+
+            await $.ajax({
+                url: "http://localhost:4000/api/lists/isMyList/" + listaID, type: "GET",
+                xhrFields: { withCredentials: true },
+                crossDomain: true,
+                success: function (data, status, request) {
+                    if (data.isMyList) {
+                        isMyList = true;
+                    }
+                }, error: function (res, errorStatus, error) { console.log(errorStatus) }
+            })
+
+            await $.ajax({
+                url: "http://localhost:4000/api/lists/listproducts/" + listaID, type: "GET",
+                xhrFields: { withCredentials: true },
+                crossDomain: true,
+                success: function (data, status, request) {
+                    data.map(productos => {
+                        $("#list-products-list").append(getProductsList(productos, isMyList));
+                    })
+
+                }, error: function (res, errorStatus, error) { console.log(errorStatus) }
+            })
+
+            if (isMyList) {
+                $.get("./rec/emptyProduct.html", data => {
+                    $("#list-products-list").append(data);
+                });
             }
 
             $.ajax({
@@ -32,11 +60,127 @@
                 xhrFields: { withCredentials: true },
                 crossDomain: true,
                 success: function (data, status, request) {
-                    $("#bigList").append(getBigList(data));
-                }, error: function (res, errorStatus, error) { console.log(errorStatus) }
+                    if (data) {
+                        $("#bigList").append(getBigList(data, isMyList))
+                        $("#nameModInput").val(data.name);
+                        $("#descModInput").val(data.desc);
+
+                        $("#Privada").parent().removeClass("active");
+                        $("#Publica").parent().removeClass("active");
+
+                        if (data.pubpriv) {
+                            $("#Publica").parent().addClass("active");
+                            $("#Publica").prop("checked", data.pubpriv);
+                        } else {
+                            $("#Privada").parent().addClass("active");
+                            $("#Privada").prop("checked", !data.pubpriv);
+                        }
+                    }
+                    else {
+                        debugger
+                        window.location.replace("./index.html");
+                    }
+                }, error: function (res, errorStatus, error) {
+                    console.log(errorStatus)
+                    window.location.replace("./index.html");
+                }
             })
-            $("#footer").load("./rec/footer.html");
-            $("#loginRegis").load("./rec/loginRegister.html");
+
+            $(document).on("click", ".deleteList", function () {
+                if (confirm("¿Seguro que quieres eliminar esta lista?")) {
+                    $.ajax({
+                        url: "http://localhost:4000/api/lists/" + listaID, type: "DELETE",
+                        xhrFields: { withCredentials: true },
+                        crossDomain: true,
+                        success: function (data, status, request) {
+                            alert("Se elimino la lista con exito")
+                            debugger
+                            window.location.replace("./index.html");
+                        }, error: function (res, errorStatus, error) {
+                            console.log(errorStatus)
+                            alert(errorStatus)
+                        }
+                    })
+                }
+            })
+            var idProduct = null
+            $(document).on("click", ".modProduct",  function () {
+                idProduct = $(this).attr('data-id');
+                $.ajax({
+                    url: "http://localhost:4000/api/products/" + idProduct, type: "GET",
+                    xhrFields: { withCredentials: true },
+                    crossDomain: true,
+                    success: function (data, status, request) {
+
+                        $("#nameModProduct").val(data.name);
+                        $("#descModProduct").val(data.desc);
+
+                        $("#SetieneMod").parent().removeClass("active");
+                        $("#SeBuscaMod").parent().removeClass("active");
+
+                        if (data.seTiene) {
+                            $("#SetieneMod").parent().addClass("active");
+                            $("#SetieneMod").prop("checked", data.pubpriv);
+                        } else {
+                            $("#SeBuscaMod").parent().addClass("active");
+                            $("#SeBuscaMod").prop("checked", !data.pubpriv);
+                        }
+
+                    }, error: function (res, errorStatus, error) { console.log(errorStatus) }
+                })
+            })
+
+            $(document).on("click", ".deleteProduct", function () {
+                var idProduct = $(this).attr('data-id');
+
+                if (confirm("¿Seguro que quieres eliminar este producto?")) {
+                    $.ajax({
+                        url: "http://localhost:4000/api/products/" + idProduct, type: "DELETE",
+                        xhrFields: { withCredentials: true },
+                        crossDomain: true,
+                        success: function (data, status, request) {
+                            alert("Se elimino el producto con exito")
+                            debugger
+                            window.location.reload();
+                        }, error: function (res, errorStatus, error) {
+                            console.log(errorStatus)
+                            alert(errorStatus)
+                        }
+                    })
+                }
+            })
+
+            $(document).on("submit", '#formModProduct', function (e) {
+
+                var form = $('#formModProduct')[0]; // You need to use standard javascript object here
+                var formData = new FormData(form);
+
+                
+
+                e.preventDefault();
+                debugger
+                $.ajax({
+                    url: 'http://localhost:4000/api/products/' + idProduct,
+                    data: formData,
+                    type: 'PUT',
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        alert(data.status);
+                        $("#ModProductModal").modal("hide");
+
+                    },
+                    error: function (status) {
+                        alert(status.responseJSON.status);
+                        $("#ModProductModal").modal("hide");
+
+                    }
+                });
+
+            })
         })
     </script>
 
@@ -45,8 +189,10 @@
         crossorigin="anonymous"></script>
 </head>
 
-<body style="overflow-y:hidden;">
+<body>
     <div id="navbar"></div>
+    <div id="modListDiv"></div>
+    <div id="modProductDiv"></div>
 
     <div class="row m-0 w-100">
         <div id="bigList" class="my-auto col-sm-12 col-lg-4">
@@ -60,7 +206,6 @@
     </div>
     <div class="mb-5"></div>
     <div id="footer"></div>
-    <div id="loginRegis"></div>
 
     <style>
         #items::-webkit-scrollbar {

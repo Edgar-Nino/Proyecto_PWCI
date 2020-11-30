@@ -1,0 +1,68 @@
+<div class="modal fade" id="ModProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modificar Producto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="formModProduct">
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Nombre</span>
+                        </div>
+                        <input type="text" id="nameModProduct" name="name" class="form-control" required aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Descripción</span>
+                        </div>
+                        <textarea class="form-control" id="descModProduct" name="desc" aria-label="With textarea" required></textarea>
+                    </div>
+
+
+
+                    <div class="input-group mb-3">
+                        <div class="custom-file">
+                            <input type="file" name="image" accept="image/*" class="custom-file-input" id="FileModProduct"
+                                required>
+                            <label class="custom-file-label" for="FileModProduct">Escoge una imagen</label>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-text">
+                            <label for="">Se tiene o se busca</label>
+                        </div>
+                        <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                            <label class="btn btn-secondary active">
+                                <input type="radio" id="SetieneMod" value=true name="seTiene" autocomplete="off" checked>
+                                Se tiene
+                            </label>
+                            <label class="btn btn-secondary">
+                                <input type="radio" id="SeBuscaMod" value=false name="seTiene" autocomplete="off">
+                                Se busca
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <input type="submit" class="btn btn-primary" value="Enviar">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(".custom-file-input").on("change", function () {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
+</script>

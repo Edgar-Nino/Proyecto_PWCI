@@ -1,62 +1,53 @@
-<script>
-    $(function () {
-        $("#newLista").click(function () {
-            $("#AddList").modal("show");
-        })
-    })
 
-    $(document).on("submit", '#formAddList', function (e) {
-        var form = $('#formAddList')[0]; // You need to use standard javascript object here
+<script>
+    $(document).on("submit", '#formModList', function (e) {
+        var id_list = getUrlParameter("lista")
+
+        var form = $('#formModList')[0]; // You need to use standard javascript object here
         var formData = new FormData(form);
+        e.preventDefault();
+        debugger
         $.ajax({
-            url: 'http://localhost:4000/api/lists/',
+            url: 'http://localhost:4000/api/lists/'+id_list,
             data: formData,
-            type: 'POST',
+            type: 'PUT',
             xhrFields: {
                 withCredentials: true
             },
             contentType: false,
             processData: false,
             success: function (data) {
-                $("#AddList").modal("hide");
-                debugger
                 alert(data.status);
+                $("#ModListModal").modal("hide");
+                
             },
             error: function (status) {
-                $("#AddList").modal("hide");
-                alert(status);
+                alert(status.responseJSON.status);
+                $("#ModListModal").modal("hide");
+                
             }
         });
-        e.preventDefault();
+        
     })
 </script>
 
-<div id="newLista" style="cursor: pointer;" class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 my-auto">
-    <div style="border-width: 5px; border-style: dashed;" class="shadow card py-5">
-        <div class="text-center">
-            <span style="font-size: 500%; color: gray;">+</span><br>
-            <span style="font-size: 200%; color: gray;">Agrega una lista</span>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="AddList" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+<div class="modal fade" id="ModListModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Agregar Lista</h5>
+                <h5 class="modal-title" id="exampleModalLongTitle">Modificar Lista</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form id="formAddList" method="POST">
+            <form id="formModList">
                 <div class="modal-body">
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Nombre</span>
                         </div>
-                        <input type="text" name="name" class="form-control" required aria-label="Default"
+                        <input type="text" id="nameModInput" name="name" class="form-control" required aria-label="Default"
                             aria-describedby="inputGroup-sizing-default">
                     </div>
 
@@ -64,7 +55,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text">Descripción</span>
                         </div>
-                        <textarea class="form-control" name="desc" aria-label="With textarea" required></textarea>
+                        <textarea class="form-control" id="descModInput" name="desc" aria-label="With textarea" required></textarea>
                     </div>
 
 
@@ -82,11 +73,11 @@
                         </div>
                         <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
                             <label class="btn btn-secondary active">
-                                <input type="radio" value=true name="pubpriv" id="Publica" autocomplete="off" checked>
+                                <input type="radio" id="Publica" value=true name="pubpriv" id="Publica" autocomplete="off" checked>
                                 Publica
                             </label>
                             <label class="btn btn-secondary">
-                                <input type="radio" value=false name="pubpriv" id="Privada" autocomplete="off">
+                                <input type="radio" id="Privada" value=false name="pubpriv" id="Privada" autocomplete="off">
                                 Privada
                             </label>
                         </div>

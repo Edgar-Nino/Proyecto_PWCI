@@ -9,12 +9,11 @@
     <link rel="stylesheet" href="css/bootstrap.min.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
+    <script src="./js/helper.js"></script>
     <script>
         $(async function () {
             $("#navbar").load("./rec/navbar.html");
-            $("#modalAddList").load("./rec/addList.html")
-
+            $("#footer").load("./rec/footer.html");
             try {
                 await $.ajax({
                     url: "http://localhost:4000/api/lists/myLists", type: "POST",
@@ -25,52 +24,16 @@
                         data.map(data => {
                             $("#list-list").append(getLists(data));
                         })
-                        console.log(request.getAllResponseHeaders());
+                        
                     }, error: function (res, errorStatus, error) { console.log(errorStatus) }
                 })
             } catch (e) {
                 console.log(e)
             }
 
-
-
             $.get("./rec/emptyList.html", data => {
                 $("#list-list").append(data);
             });
-
-
-
-            $(document).on("click", "#newLista", function () {
-                $("#AddList").modal("show")
-            })
-
-            $(document).on("submit", '#formAddList', function (e) {
-                var form = $('#formAddList')[0]; // You need to use standard javascript object here
-                var formData = new FormData(form);
-                $.ajax({
-                    url: 'http://localhost:4000/api/lists/',
-                    data: formData,
-                    type: 'POST',
-                    xhrFields: {
-                        withCredentials: true
-                    },
-                    contentType: false,
-                    processData: false,
-                    success: function (data) {
-                        $("#AddList").modal("hide");
-                        debugger
-                        alert(data.status);
-                    },
-                    error: function (status) {
-                        $("#AddList").modal("hide");
-                        alert(status);
-                    }
-                });
-                e.preventDefault();
-            })
-
-            $("#footer").load("./rec/footer.html");
-            $("#loginRegis").load("./rec/loginRegister.html");
         })
     </script>
 
@@ -91,8 +54,6 @@
     <div class="mb-5"></div>
 
     <div id="footer"></div>
-
-    <div id="loginRegis"></div>
 </body>
 
 </html>

@@ -10,21 +10,47 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+    <script src="./js/helper.js"></script>
+
     <script>
         $(function () {
             $("#navbar").load("./rec/navbar.html");
-            $("#addModal").load("./rec/addProductList.html")
-            $.ajax({url:"http://localhost:4000/api/products/", type:"GET",
-                success:function(data,status,request){
-                data.map(producto=>{
-                    $("#product-list").append(getProducts(producto));
-                })
-                console.log(request.getAllResponseHeaders());
-            },error:function(res,errorStatus,error)
-            {console.log(errorStatus)} })
+
+            var num = getUrlParameter("num") ? parseInt(getUrlParameter("num")) : 1
+
+            if(num==1)
+            {
+                $("#AnteriorBtn").prop("disabled",true)
+            }
+
+            $.ajax({
+                url: "http://localhost:4000/api/products/nav/" + num, type: "GET",
+                success: function (data, status, request) {
+                    if(data.length<6)
+                    {
+                        $("#SiguienteBtn").prop("disabled",true)
+                    }
+
+                    data.map(data => {
+                        $("#product-list").append(getProducts(data));
+                    })
+                    console.log(request.getAllResponseHeaders());
+                }, error: function (res, errorStatus, error) { console.log(errorStatus) }
+            })
 
             $("#footer").load("./rec/footer.html");
-            $("#loginRegis").load("./rec/loginRegister.html");
+
+            $(document).on("click", "#AnteriorBtn", function () {
+                num--;
+                window.location.replace("./productos.html?num="+num)
+            })
+
+            $(document).on("click", "#SiguienteBtn", function () {
+                num++;
+                window.location.replace("./productos.html?num="+num)
+            })
+
+            $("#footer").load("./rec/footer.html");
         })
     </script>
 
@@ -41,6 +67,11 @@
         
     </div>
 
+    <div class="row m-0">
+        <button id="AnteriorBtn" class="btn-primary btn col-6">Anterior pagina</button>
+        <button id="SiguienteBtn" class="btn-primary btn col-6">Siguiente pagina</button>
+    </div>
+
     <div class="mb-5"></div>
 
     <style>
@@ -51,8 +82,6 @@
     </style>
 
     <div id="footer"></div>
-
-    <div id="loginRegis"></div>
 </body>
 
 </html>
