@@ -9,7 +9,6 @@ const userSchema = new Schema({
     password:{type:String,required:true},
     imgURL:{type:String,required:true},
     pubpriv:{type:Boolean,required:true},
-    type:{type:String,required:true,default:1},
 },{
     timestamps: true,
     versionKey: false
