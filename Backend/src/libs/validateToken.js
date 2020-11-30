@@ -2,9 +2,9 @@
 const jwt = require('jsonwebtoken')
 
 module.exports = function (req, res, next) {
-    const token = req.header('auth-token');
-    if (!token) return res.status(401).json({ status: 'Acceso Denegado' });
-
+    const token = req.cookies['auth-token'];
+    if (!token) return res.status(401).json({ status: {notAuthorized: "No estas logeado o no tienes permiso para entrar en esta pagina", msg:'Acceso Denegado'} });
+    
     var payload=0;
     try {
         payload = jwt.verify(token, process.env.SECRETKEY || 'keyNoTanSecreta')
