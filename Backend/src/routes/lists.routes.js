@@ -4,11 +4,13 @@ const router = Router();
 const listsCtrl = require('../controllers/lists.controller');
 
 const tokenValidator = require("../libs/validateToken")
+const tokenValidatorList = require("../libs/validateTokenList")
 
 const path = require('path');
 srcPath = path.join(__dirname, "..", "/public/uploads/");
 
 var multer = require('multer');
+const validateToken = require('../libs/validateToken');
 
 var storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -35,9 +37,13 @@ var upload = multer({
 }).single('image');
 
 router.get('/', listsCtrl.getLists);
+router.get('/nav/:id', listsCtrl.getListsNav);
 router.post('/myLists', tokenValidator, listsCtrl.myLists);
 router.post('/', [tokenValidator, upload], listsCtrl.createList);
-router.get('/:id', listsCtrl.getList);
+router.get('/listproducts/:id', tokenValidatorList, listsCtrl.getListProducts);
+router.get('/search/:id/:page', tokenValidatorList, listsCtrl.searchList);
+router.get('/:id', tokenValidatorList, listsCtrl.getList);
+router.get('/isMyList/:id', tokenValidatorList, listsCtrl.isMyList);
 router.put('/:id', [tokenValidator, upload], listsCtrl.editList);
 router.delete('/:id', tokenValidator , listsCtrl.deleteList);
 

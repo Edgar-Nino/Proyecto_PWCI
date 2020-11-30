@@ -36,11 +36,13 @@ var upload = multer({
 }).single('image');
 
 router.get('/', usersCtrl.getUsers);
+router.get('/search/:id', usersCtrl.searchUser);
 router.get('/:id', usersCtrl.getUser);
 router.post('/logIn', usersCtrl.logIn);
 router.post('/signUp', upload, usersCtrl.signUp);
 router.get('/v1/profile', tokenValidator, usersCtrl.profile);
-router.put('/:id', [tokenValidator,upload], usersCtrl.editUser);
-router.delete('/:id', tokenValidator, usersCtrl.deleteUser);
+router.get('/v1/logOut', tokenValidator, usersCtrl.logOut);
+router.put('/', [tokenValidator,upload], usersCtrl.editUser);
+router.delete('/', tokenValidator, usersCtrl.deleteUser);
 
 module.exports = router;

@@ -36,6 +36,7 @@ var upload = multer({
 }).single('image');
 
 router.get('/', productsCtrl.getProducts);
+router.get('/nav/:id', productsCtrl.getProductsNav);
 router.post('/', [tokenValidator, upload], productsCtrl.createProduct);
 router.get('/:id', productsCtrl.getProduct);
 router.put('/:id', [tokenValidator, upload], productsCtrl.editProduct);
