@@ -27,7 +27,7 @@ var upload = multer({
     storage: storage,
     fileFilter: function (req, file, callback) {
         var ext = path.extname(file.originalname);
-        if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
+        if (ext !== '.png' && ext !== '.bmp' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
             return callback(new Error('Solo se admiten imagenes'))
         }
         callback(null, true)
@@ -36,7 +36,8 @@ var upload = multer({
 }).single('image');
 
 router.get('/', usersCtrl.getUsers);
-router.get('/search/:id', usersCtrl.searchUser);
+router.get('/nav/:id', usersCtrl.getUsersNav);
+router.get('/search/:id/:page', usersCtrl.searchUser);
 router.get('/:id', usersCtrl.getUser);
 router.post('/logIn', usersCtrl.logIn);
 router.post('/signUp', upload, usersCtrl.signUp);
