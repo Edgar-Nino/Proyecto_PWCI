@@ -8,7 +8,7 @@ const User = require('../models/users')
 
 listsCtrl.getLists = async (req, res) => {
     try {
-        const lists = await List.find({ pubpriv: true })
+        const lists = await List.find({ pubpriv: true }).sort({ createdAt: -1 })
         res.json(lists);
     }
     catch (e) {
@@ -18,10 +18,10 @@ listsCtrl.getLists = async (req, res) => {
 
 listsCtrl.getListsNav = async (req, res) => {
     try {
-        var numberPage = (req.params.id)?req.params.id:1;
+        var numberPage = (req.params.id) ? req.params.id : 1;
         var numberDocs = 6 * numberPage;
-        var numberSkipped = 6 * ( numberPage-1)
-        const lists = await List.find({ pubpriv: true }).skip(numberSkipped).limit(numberDocs)
+        var numberSkipped = 6 * (numberPage - 1)
+        const lists = await List.find({ pubpriv: true }).skip(numberSkipped).limit(numberDocs).sort({ createdAt: -1 })
         res.json(lists);
     }
     catch (e) {
@@ -34,7 +34,10 @@ listsCtrl.createList = async (req, res) => {
 
         const user = await User.findOne({ _id: req.userId },);
 
-        if (!user) return res.status(400).json({ status: 'No tiene permitido crear listas' });
+        if (!user) {
+            await fs.unlink('./src/public/uploads/' + req.file.filename, (err) => { })
+            return res.status(400).json({ status: 'No tiene permitido crear listas' });
+        }
 
         const newList = new List(req.body);
 
@@ -70,10 +73,10 @@ listsCtrl.getListProducts = async (req, res) => {
         const list = await List.findOne({ _id: req.params.id })
 
         if (!list) return res.status(400).json({ status: "La lista que estas buscando no existe" })
-        
+
         if ((list.user_id != req.userId) && (!list.pubpriv)) return res.status(400).json({ status: "Los productos de la lista que estas buscando son privados" })
 
-        const products = await Product.find({ id_list: req.params.id })
+        const products = await Product.find({ id_list: req.params.id }).sort({ createdAt: -1 })
 
         res.json(products);
     }
@@ -106,7 +109,9 @@ listsCtrl.editList = async (req, res) => {
     try {
 
         const list = await List.findOne({ _id: req.params.id });
-        if (req.userId != list.user_id) return res.status(400).json({ status: 'No tienes privilegios para editar esta lista' })
+        if (req.userId != list.user_id) {
+            await fs.unlink('./src/public/uploads/'+ req.file.filename, (err)=>{})
+            return res.status(400).json({ status: 'No tienes privilegios para editar esta lista' })}
 
         const user = await User.findOne({ _id: req.userId },);
 
@@ -128,16 +133,17 @@ listsCtrl.editList = async (req, res) => {
 
 listsCtrl.searchList = async (req, res) => {
     try {
-        var numberPage = (req.params.page)?req.params.page:1;
+        var numberPage = (req.params.page) ? req.params.page : 1;
         var numberDocs = 6 * numberPage;
-        var numberSkipped = 6 * ( numberPage-1)
+        var numberSkipped = 6 * (numberPage - 1)
 
         var string = req.params.id;
-        var regex = new RegExp([ string])
+        var regex = new RegExp([string])
 
-        const lists = await List.find({ 
-            $and: [{name:{ $regex: regex, $options: 'i' }}, { $or: [{ pubpriv: true }, { user_id: req.userId }] }] }
-            ).skip(numberSkipped).limit(numberDocs)
+        const lists = await List.find({
+            $and: [{ name: { $regex: regex, $options: 'i' } }, { $or: [{ pubpriv: true }, { user_id: req.userId }] }]
+        }
+        ).skip(numberSkipped).limit(numberDocs).sort({ createdAt: -1 })
         res.json(lists);
     }
     catch (e) {
