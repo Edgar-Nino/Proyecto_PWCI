@@ -138,7 +138,7 @@ function getCategories(data) {
 }
 
 function userDropdown(data) {
-    helper = "<a href='./settingsUser.html'><button class='dropdown-item'>Editar</button></a>" +
+    helper = "<button id='EditarUser' class='dropdown-item'>Editar</button></a>" +
         "<button id='buttonDeleteUser' class='dropdown-item' >Darte de baja</button>" +
         "<button class='dropdown-item' id='LogOut' href='#'>Log Out</button>"
 
