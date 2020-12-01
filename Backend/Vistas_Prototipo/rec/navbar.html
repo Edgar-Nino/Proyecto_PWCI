@@ -22,12 +22,28 @@
                     $("#User_Dropdown").append(userDropdown(data));
                     $("#User_Icon").append(getUserImage(data));
                     $("#navbar-list-items").append(getList("myList"))
+
+                    $("#usernameModE").val(data.username);
+                    $("#emailModE").val(data.email);
+
+                    if (data.pubpriv) {
+                        $("#PublicModE").parent().addClass("active");
+                        $("#PublicModE").prop("checked", data.pubpriv);
+                    } else {
+                        $("#PrivateModE").parent().addClass("active");
+                        $("#PrivateModE").prop("checked", !data.pubpriv);
+                    }
+
                 }, error: function (res, errorStatus, error) {
                 }
             })
         } catch {
 
         }
+
+        $(document).on("click", "#EditarUser", function () {
+            $("#EditUserModal").modal('show')
+        })
 
         $(document).on("click", "#LogOut", function () {
             $.ajax({
@@ -90,6 +106,10 @@
 
             <li class="nav-item">
                 <a class="nav-link" href="./productos.html">Productos</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="./users.html">Usuarios</a>
             </li>
 
         </ul>
@@ -164,61 +184,110 @@
 
         })
 
+        $("#RegisterForm").on("submit", async function (e) {
+            var validationSuccess = true;
+            var form = $('#RegisterForm')[0];
+            var formData = new FormData(form)
 
+            var usernameR = $("#usernameR").val();
+            var emailR = $("#emailR").val();
+            var passwordR = $("#passwordR").val();
+            var passwordRR = $("#passwordRR").val();
+
+            if (!validate_length(usernameR, 3)) {
+                validationSuccess = false;
+                alert("Ingresa un username mayor o igual a 3 caracteres")
+            }
+            if (!validar_email(emailR)) {
+                validationSuccess = false;
+                alert('Ingresa una contraseña con 8 o más caracteres, que incluya una minuscula, una mayuscula y un caracter especial (!#"$%&/()=?¡¿)')
+            }
+            if (!validate_password(passwordR)) {
+                validationSuccess = false;
+                alert('Ingresa una contraseña con 8 o más caracteres, que incluya una minuscula, una mayuscula y un caracter especial (!#"$%&/()=?¡¿)')
+            }
+            if (passwordR != passwordR) {
+                validationSuccess = false;
+                alert("La contraseñas tienen que coincidir")
+            }
+            if ($("#fileAvatar").get(0).files.length === 0) {
+                alert("Ingresa un avatar");
+                validationSuccess = false;
+            }
+            if (validationSuccess) {
+                await $.ajax({
+                    url: 'http://localhost:4000/api/users/signUp',
+                    data: formData,
+                    dataType: "JSON",
+                    xhrFields: { withCredentials: true },
+                    crossDomain: true,
+                    type: 'POST',
+                    processData: false,
+                    contentType: false,
+                    success: function (data, status, request) {
+                        alert("Ingreso correctamente");
+                        window.location.reload();
+                    },
+                    error: function (data, status, request) {
+                        alert(data.responseJSON.status)
+                    }
+                });
+            }
+            e.preventDefault();
+            return false;
+        })
+
+        $("#formEditUser").on("submit", async function (e) {
+            var validationSuccess = true;
+            var form = $('#formEditUser')[0];
+            var formData = new FormData(form)
+
+            var usernameR = $("#usernameModE").val();
+            var emailR = $("#emailModE").val();
+            var passwordR = $("#passwordModE").val();
+
+            if (!validate_length(usernameR, 3)) {
+                validationSuccess = false;
+                alert("Ingresa un username mayor o igual a 3 caracteres")
+            }
+            if (!validate_password(passwordR)) {
+                validationSuccess = false;
+                alert('Ingresa una contraseña con 8 o más caracteres, que incluya una minuscula, una mayuscula y un caracter especial (!#"$%&/()=?¡¿)')
+            }
+            if (!validar_email(emailR)) {
+                validationSuccess = false;
+                alert('Ingresa una contraseña con 8 o más caracteres, que incluya una minuscula, una mayuscula y un caracter especial (!#"$%&/()=?¡¿)')
+            }
+            if ($("#editImageUser").get(0).files.length === 0) {
+                alert("Ingresa un avatar");
+                validationSuccess = false;
+            }
+            if (validationSuccess) {
+                await $.ajax({
+                    url: 'http://localhost:4000/api/users/',
+                    data: formData,
+                    dataType: "JSON",
+                    xhrFields: { withCredentials: true },
+                    crossDomain: true,
+                    type: 'PUT',
+                    processData: false,
+                    contentType: false,
+                    success: function (data, status, request) {
+                        debugger
+                        $("#EditUserModal").modal("hide");
+                        alert("Se edito correctamente");
+                        window.location.reload();
+                    },
+                    error: function (data, status, request) {
+                        alert(data.responseJSON.status)
+                    }
+                });
+            }
+            e.preventDefault();
+            return false;
+        })
     })
-    $(document).on("submit", "#RegisterForm", function (e) {
-        var validationSuccess = true;
-        var form = $('#RegisterForm')[0];
-        var formData = new FormData(form)
 
-        var usernameR = $("#usernameR").val();
-        var emailR = $("#usernameR").val();
-        var passwordR = $("#passwordR").val();
-        var passwordRR = $("#passwordRR").val();
-
-        if(!validate_length(usernameR,3))
-        {
-            validationSuccess = false;
-            alert("Ingresa un username mayor o igual a 3 caracteres")
-        }
-        if(!validate_password(passwordR))
-        {
-            validationSuccess = false;
-            alert('Ingresa una contraseña con 8 o más caracteres, que incluya una minuscula, una mayuscula y un caracter especial (!#"$%&/()=?¡¿)')
-        }
-        if(passwordR!=passwordR)
-        {
-            validationSuccess=false;
-            alert("La contraseñas tienen que coincidir")
-        }
-        if ($("#fileAvatar").get(0).files.length === 0) {
-            alert("Ingresa un avatar");
-            validationSuccess = false;
-        }
-        if (validationSuccess) {
-            $.ajax({
-                url: 'http://localhost:4000/api/users/signUp',
-                data: formData,
-                dataType: "JSON",
-                xhrFields: { withCredentials: true },
-                crossDomain: true,
-                type: 'POST',
-                processData: false,
-                contentType: false,
-                success: function (data, status, request) {
-                    debugger
-                    $("#modalLRForm").modal("hide");
-                    alert("Ingreso correctamente");
-                    window.location.reload();
-                },
-                error: function (data, status, request) {
-                    alert(data.responseJSON.status)
-                }
-            });
-        }
-        e.preventDefault();
-        return false;
-    })
 </script>
 
 <div class="modal fade" id="modalLRForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -262,7 +331,7 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="register" role="tabpanel">
-                        <form id="RegisterForm" class="modal-body">
+                        <form id="RegisterForm" method="POST" class="modal-body">
                             <div class="form-group">
                                 <label data-error="wrong" data-success="right" for="usernameR">Nombre de usuario</label>
                                 <input type="text" id="usernameR" min="3" required name="username"
@@ -291,7 +360,7 @@
                                 <label data-error="wrong" data-success="right" for="fileAvatar">Ingresa un
                                     avatar</label>
                                 <input name="image" accept="image/*" id="fileAvatar" type="file"
-                                    onchange="validateImage('fileAvatar')" required id=" file"
+                                    onchange="validateImage('fileAvatar')" required
                                     class="form-control-file form-control-lg validate">
                             </div>
 
@@ -301,8 +370,7 @@
                                 </div>
                                 <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
                                     <label class="btn btn-secondary active">
-                                        <input type="radio" value=true name="pubpriv" autocomplete="off"
-                                            checked>
+                                        <input type="radio" value=true name="pubpriv" autocomplete="off" checked>
                                         Publico
                                     </label>
                                     <label class="btn btn-secondary">
@@ -330,3 +398,76 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="EditUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar usuario</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="formEditUser" method="POST">
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Nombre</span>
+                        </div>
+                        <input id="usernameModE" type="text" name="name" class="form-control" required
+                            aria-label="Default" aria-describedby="inputGroup-sizing-default">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Email</span>
+                        </div>
+                        <input id="emailModE" type="text" name="email" class="form-control" required
+                            aria-label="Default" aria-describedby="inputGroup-sizing-default">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Contraseña</span>
+                        </div>
+                        <input id="passwordModE" type="password" name="password" class="form-control" required
+                            aria-label="Default" aria-describedby="inputGroup-sizing-default">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="custom-file">
+                            <input type="file" required name="image" accept="image/*" class="custom-file-input" id="editImageUser" onchange="validateImage('editImageUser')"
+                                required>
+                            <label class="custom-file-label" for="editImageUser">Escoge una imagen</label>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-text">
+                            <label for="PubPrivUserM">Publico o privado</label>
+                        </div>
+                        <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                            <label class="btn btn-secondary active">
+                                <input id="PublicModE" type="radio" value=true name="pubpriv" id="PubUserM" autocomplete="off" checked>
+                                Publico
+                            </label>
+                            <label class="btn btn-secondary">
+                                <input id="PrivateModE" type="radio" value=false name="pubpriv" id="PrivUserM" autocomplete="off">
+                                Privado
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(".custom-file-input").on("change", function () {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
+</script>
