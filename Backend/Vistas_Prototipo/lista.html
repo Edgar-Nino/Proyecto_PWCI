@@ -126,7 +126,8 @@
                             $("#SeBuscaMod").prop("checked", !data.pubpriv);
                         }
 
-                    }, error: function (res, errorStatus, error) { console.log(errorStatus) }
+                    }, error: function (res, errorStatus, error) { 
+                    }
                 })
             })
 
@@ -173,10 +174,9 @@
                         $("#ModProductModal").modal("hide");
 
                     },
-                    error: function (status) {
-                        alert(status.responseJSON.status);
+                    error: function (res, errorStatus, error) {
+                        alert("No se pudo modificar el producto, subiste un archivo que no es .png, .jpg, .gif o .jpeg o dejaste campos vacios");
                         $("#ModProductModal").modal("hide");
-
                     }
                 });
 

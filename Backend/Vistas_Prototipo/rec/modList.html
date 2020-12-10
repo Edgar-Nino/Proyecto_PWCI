@@ -22,7 +22,7 @@
                 
             },
             error: function (status) {
-                alert(status.responseJSON.status);
+                alert("No se pudo modificar la lista, subiste un archivo que no es .png, .jpg, .gif o .jpeg o dejaste campos vacios");
                 $("#ModListModal").modal("hide");
                 
             }

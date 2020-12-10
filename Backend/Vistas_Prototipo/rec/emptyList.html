@@ -24,7 +24,7 @@
             },
             error: function (status) {
                 $("#AddList").modal("hide");
-                alert(status);
+                alert("No se pudo modificar la lista, subiste un archivo que no es .png, .jpg, .gif o .jpeg o dejaste campos vacios");
             }
         });
         e.preventDefault();

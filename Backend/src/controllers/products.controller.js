@@ -78,6 +78,8 @@ productsCtrl.getProduct = async (req, res) => {
 }
 
 productsCtrl.editProduct = async (req, res) => {
+    
+    
     try {
         const product = await Product.findOne({ _id: req.params.id });
 
@@ -107,6 +109,7 @@ productsCtrl.editProduct = async (req, res) => {
         res.json({ status: 'Se actualizo el producto' });
     }
     catch (e) {
+        console.log(e);
         res.status(500).json({ status: 'No se actualizo el producto' })
         await fs.unlink('./src/public/uploads/' + req.file.filename, (err) => { })
     }

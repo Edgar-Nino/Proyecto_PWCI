@@ -28,7 +28,8 @@ var upload = multer({
     fileFilter: function (req, file, callback) {
         var ext = path.extname(file.originalname);
         if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
-            return callback(new Error('Solo se admiten imagenes'))
+            
+            return callback(new Error('Solo se admiten imagenes .png, .jpg, .gif, .jpeg'))
         }
         callback(null, true)
     },

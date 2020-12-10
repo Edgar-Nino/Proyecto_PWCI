@@ -41,9 +41,9 @@
                     alert(data.status);
                 },
                 error: function (status) {
-                    debugger
+
                     $("#AddList").modal("hide");
-                    alert(status.responseJSON.status);
+                    alert("No se pudo modificar el producto, subiste un archivo que no es .png, .jpg, .gif o .jpeg o dejaste campos vacios");
                 }
             });
             e.preventDefault();
